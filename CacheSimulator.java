@@ -27,6 +27,7 @@ public class CacheSimulator {
     /** Counter size MAX. */
     static final int COUNT = 4;
     
+    
     public static void main(String[] args) {
         int[] options = verifyInputParams(args);
         if (options == null) {
@@ -39,9 +40,29 @@ public class CacheSimulator {
         }
         
         try {
+            processTrace(options, file);
             file.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+    
+    
+    static final class CacheBlock {
+        public int tag;
+        public boolean v;
+        
+        public CacheBlock(int op, boolean add) {
+            this.tag = op;
+            this.v = add;
+        }
+        
+        public int getTag() {
+            return this.tag;
+        }
+        
+        public boolean getV() {
+            return this.v;
         }
     }
     
@@ -86,7 +107,7 @@ public class CacheSimulator {
     
     
     public static int[] verifyInputParams(String[] args) {
-        int[] options = new int[TPARAM];
+        int[] options = new int[TPARAM - 1];
         
         if (args.length != TPARAM) {
             System.err.println("Insufficient number of arguments.");
@@ -197,7 +218,12 @@ public class CacheSimulator {
         return pair;
     }
     
-    
+    /**
+     * 
+     * @param options
+     * @param file
+     * @throws IOException
+     */
     public static void processTrace(int[] options, BufferedReader file) 
         throws IOException {
         assert (file.ready());
@@ -209,7 +235,7 @@ public class CacheSimulator {
         }
         
         int a = 0;
-        int[][] cache = new int[options[a]][options[++a]];
+        CacheBlock[][] cache = new CacheBlock[options[a]][options[++a]];
         
         String line = null;
         while ((line = file.readLine()) != null) {
@@ -231,7 +257,8 @@ public class CacheSimulator {
      * @param rep is the replacement scheme FIFO or least recent
      * @return number of cycles required.
      */
-    public static int loadValue(int[][] cache, Int counter, int addr, int rep) {
+    public static int loadValue(CacheBlock[][] cache, Int counter, int addr
+            , int rep) {
         counter.increment();
         
         return 0;
